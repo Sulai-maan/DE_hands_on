@@ -1,0 +1,39 @@
+Question 3. Count records = 15612
+CREATE INDEX idx_trip_dates_green ON green_taxi_trips(DATE(lpep_pickup_datetime), DATE(lpep_dropoff_datetime)) 
+
+SELECT COUNT(*) FROM green_taxi_trips WHERE DATE(lpep_pickup_datetime) = '2019-09-18' 
+AND DATE(lpep_dropoff_datetime) = '2019-09-18';
+
+Question 4. Longest trip for each day = 2019-09-26
+SELECT DATE(lpep_pickup_datetime) FROM green_taxi_trips ORDER BY trip_distance DESC LIMIT 1;
+
+Question 5. Three biggest pick up Boroughs = "Brooklyn" "Manhattan" "Queens" 
+
+SELECT 
+    tz."Borough", SUM(gt."fare_amount")
+FROM green_taxi_trips gt JOIN taxi_zones tz ON gt."PULocationID" = tz."LocationID"
+WHERE DATE(gt.lpep_pickup_datetime) = '2019-09-18' AND tz."Borough" IS NOT NULL
+GROUP BY tz."Borough" HAVING SUM(gt."fare_amount") > 50000;
+
+Question 6. Largest tip = JFK Airport
+
+WITH SEPTEMBER_PICKUPS AS (
+    SELECT 
+        *
+    FROM green_taxi_trips
+    WHERE DATE_TRUNC('month', lpep_pickup_datetime)::DATE = '2019-09-01'
+), astoria_id AS (
+    SELECT
+        *
+    FROM taxi_zones WHERE "Zone" = 'Astoria'
+), 
+joined_september_ranked AS (
+    SELECT
+        *, RANK() OVER (ORDER BY (sp.tip_amount) DESC) as rank_by_tip
+    FROM SEPTEMBER_PICKUPS sp JOIN astoria_id ai ON sp."PULocationID" = ai."LocationID"
+)
+
+SELECT 
+    tz."Zone"
+FROM joined_september_ranked js JOIN taxi_zones tz ON js."DOLocationID" = tz."LocationID"
+WHERE js.rank_by_tip = 1;

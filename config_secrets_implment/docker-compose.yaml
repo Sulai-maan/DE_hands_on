@@ -1,0 +1,51 @@
+services:
+  datatalks_postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: /run/secrets/postgres_user
+      POSTGRES_PASSWORD: /run/secrets/postgres_password
+      POSTGRES_DB: /postgres_db_name
+    ports:
+      - 5432:5432
+    configs:
+     - postgres_db_name
+     - postgres_db_volume
+    secrets:
+      - postgres_user
+      - postgres_password
+    volumes:
+      - /postgres_db_volume:
+
+  datatalks_pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: /run/secrets/pgadmin_email
+      PGADMIN_DEFAULT_PASSWORD: /run/secrets/pgadmin_password
+    ports:
+      - 80:80
+    secrets:
+      - pgadmin_email
+      - pgadmin_password
+  
+  datatalks_ingest:
+    image:
+      build:
+        context: ingest-Dockerfile
+    depends-on:
+      - datatalks_postgres
+
+configs:
+  postgres_db_name:
+    file: ./configs/postgres_db_name.txt
+  postgres_db_volume:
+    file: ./configs/postgres_db_volume.txt
+
+secrets:
+  pgadmin_email:
+    file: ./secrets/pgadmin_email.txt
+  pgadmin_password:
+    file: ./secrets/pgadmin_password.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  postgres_user:
+    file: ./secrets/postgres_user.txt
