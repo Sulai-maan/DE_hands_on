@@ -26,8 +26,8 @@ for chunk in df_iter:
     if chunk_num == 0:
       chunk.to_sql("green_taxi_trips", con=conn_engine, if_exists="replace")
     else:
-        # Write chunk to db
-        chunk.to_sql("green_taxi_trips", con=conn_engine, if_exists="append")
+      # Write chunk to db
+      chunk.to_sql("green_taxi_trips", con=conn_engine, if_exists="append")
     
     chunk_num += 1
 
