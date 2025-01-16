@@ -14,11 +14,11 @@ db_name = os.getenv("POSTGRES_DB")
 conn_engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password}@localhost/{db_name}")
 
 # Read green taxi trips file as an iterator
-df_iter = pd.read_csv("green_tripdata_2019-09.csv.gz", compression="gzip", chunksize=100000)
+df_iter = pd.read_csv("green_tripdata_2019-10.csv.gz", compression="gzip", chunksize=100000)
 
 chunk_num = 0
 for chunk in df_iter:    
-    # Convert the columns for pickup and dropoff times to datetime
+    # Convert the columns fo vvr pickup and dropoff times to datetime
     chunk["lpep_pickup_datetime"] = pd.to_datetime(chunk["lpep_pickup_datetime"])
     chunk["lpep_dropoff_datetime"] = pd.to_datetime(chunk["lpep_dropoff_datetime"])
     
@@ -35,4 +35,4 @@ for chunk in df_iter:
 
 # Read and write taxi_zones file to db
 zone_df = pd.read_csv("taxi_zone_lookup.csv")
-zone_df.to_sql("taxi_zones", con=conn_engine, if_exists="replace")
+zone_df.to_sql("taxi_zones", con=conn_engine, if_exists="replace")j    n              z v, . nf b/
